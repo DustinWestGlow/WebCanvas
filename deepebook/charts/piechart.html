@@ -3,7 +3,7 @@
 <canvas width="500" height="500" id="canvas"></canvas> 
 <script> 
 //initialize data set 
-var data = [ 100, 68, 20, 30, 100 ]; 
+var data = [ 100, 68, 20, 30, 100, 50, 120, 70, 80, 25, 110, 90 ]; 
  
 var canvas = document.getElementById('canvas'); 
 var c = canvas.getContext('2d'); 
@@ -12,7 +12,7 @@ c.fillStyle = "white";
 c.fillRect(0,0,500,500);
 
 //a list of colors 
-var colors = [ "orange", "green", "blue", "yellow", "teal"]; 
+var colors = [].concat(...Array(4).fill(["red","black","yellow"]));
  
 //calculate total of all data 
 var total = 0; 
@@ -20,33 +20,46 @@ for(var i=0; i<data.length; i++) {
     total += data[i]; 
 } 
 
-c.fillStyle = '#ccddff';
-c.beginPath();
-c.moveTo(50,20);
-c.lineTo(200,50);
-c.lineTo(93,82);
-c.closePath();
-c.fill();
-c.strokeStyle = 'rgb(0,128,0)';
-c.lineWidth = 2;
-c.stroke();
+//draw pie data 
+var prevAngle = 0; 
+for(var i=0; i<data.length; i++) { 
+    //fraction that this pieslice represents 
+    var fraction = data[i]/total; 
+    //calc starting angle 
+    var angle = prevAngle + fraction*Math.PI*2; 
+     
+    //draw the pie slice 
+    // c.fillStyle = colors[i]; 
+ 
+    //fill with a radial gradient 
+    var grad = c.createRadialGradient( 250,250, 10, 250,250, 100); 
+    grad.addColorStop(0,"white"); 
+    grad.addColorStop(1,colors[i]); 
+    c.fillStyle = grad; 
+     
+    //create a path 
+    c.beginPath(); 
+    c.moveTo(250,250); 
+    c.arc(250,250, 100, prevAngle, angle, false); 
+    c.lineTo(250,250); 
+     
+    //fill it 
+    c.fill(); 
+     
+    //stroke it 
+    c.strokeStyle = "black"; 
+    c.stroke(); 
+     
+    //update for next time through the loop 
+    prevAngle = angle; 
+} 
 
-var center = {x: 250.0, y: 250.0};
-var angle = 0 * Math.PI / 360.0;
-var x = center[0];
-var y = center[1] + (500 / 2)
-for (var i = 0; i < data.length; i++) {
-    c.fillStyle = colors[i];
-    c.beginPath();
-    c.moveTo(center.x, center.y)
-    var percent = 1.0 * data[i] / total;
-    angle += (percent / 100.0) * 2.0 * Math.PI;
-    c.lineTo(x, y);
-    x = Math.cos(angle);
-    y = Math.sin(angle);
-    c.lineTo(x, y);
-    c.lineTo(center.x, center.y)
-}
+//draw centered text 
+c.fillStyle = "black"; 
+c.font = "24pt sans-serif"; 
+var text = "Sales Data from 2025"; 
+var metrics = c.measureText(text); 
+c.fillText(text, 250-metrics.width/2, 400); 
  
 </script> 
 </body> 
