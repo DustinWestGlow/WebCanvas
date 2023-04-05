@@ -2,6 +2,54 @@ function getrand(min, max) {
   return Math.random() * (max - min) + min;
 }
 
+class Character {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.vx = 0;
+    }
+}
+var me = new Character(120, 230);
+document.onkeydown = function(e) {
+	if(e.keyCode == 37) {
+	    me.vx = -1;
+	}
+    if (e.keyCode == 39) {
+	    me.vx = 1;
+	}
+}
+
+class Bullet {
+    constructor(x, y) {
+        this.x = y;
+        this.y = y;
+    }
+}
+
+var bullets = [];
+
+class Pulsar {
+    constructor(x, y) {
+        this.x = y;
+        this.y = y;
+    }
+}
+
+var pulsars = [];
+
+
+document.onkeyup = function(e) {
+	if(e.keyCode == 37 || e.keyCode == 39) {
+	    me.vx = 0;
+	}
+    if (e.keyCode == 32) {
+        var new_pulsar = new Pulsar(me.x, me.y-5);
+        pulsars.append(new_pulsar);
+    }
+}
+
+
+
 class Enemy {
   constructor() {
     this.alive = true;
@@ -12,14 +60,6 @@ for (var i = 0; i < 10; i++) {
     var new_enemy = new Enemy();
     enemies.push(new_enemy);
 }
-
-class Bullet {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-var bullets = [];
 
 //get a reference to the canvas 
 var canvas = document.getElementById('canvas'); 
@@ -76,10 +116,26 @@ function gameLoop() {
         c.fillRect(x, 10, w, w);
         // c.closePath();
     }
-    if (tick == 5) {
+    if (Math.ceil(getrand(1, 80)) == 14) {
         var bx = getrand(10, 240);
         var by = 20;
         this.bullets.push(new Bullet(bx, by));
+    }
+    for (var i = 0; i < bullets.length; i++)
+    {
+        c.fillStyle = "yellow";
+        c.fillRect(bullets[i].x, bullets[i].y,
+        5, 10);
+        bullets[i].y += 1;
+    }
+    me.x += me.vx;
+    c.fillStyle = "red";
+    c.fillRect(me.x, me.y, 10, 20);
+    for (var i = 0; i < pulsars.length; i++) {
+        c.fillStyle = "blue";
+        c.fillRect(pulsars[i].x, pulsars[i].y,
+        2, 2);
+        pulsars[i].y -= 4;
     }
 }
 window.requestAnimFrame(gameLoop);
