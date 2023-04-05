@@ -1,7 +1,12 @@
 <html> 
 <body> 
 <canvas width="250" height="250" id="canvas"></canvas> 
+<h2>above</h2>
+<img src="sprite.png" id="spriteimg">
+<h2>below</h2>
 <script> 
+
+
 
 function getrand(min, max) {
   return Math.random() * (max - min) + min;
@@ -29,13 +34,9 @@ window.requestAnimFrame = (function(){
 
 var particles = [];
 var tick = 0;
+var img = document.getElementById("spriteimg");
 function drawIt() { 
     window.requestAnimFrame(drawIt); 
-    tick ++;
-    if (tick % 2 != 0)
-    {
-        return;
-    }
     var canvas = document.getElementById('canvas'); 
     var c = canvas.getContext('2d');
     // create
@@ -49,15 +50,27 @@ function drawIt() {
         particles[i].y += 5
     }
     // draw
-    c.fillStyle = "white";
-    c.fillRect(0,0,canvas.width,canvas.height); 
+     
+    tick = (tick + 1) % 10;
     for (var i = 0; i < particles.length; i++)
     {
-        c.beginPath(); 
-        c.arc(particles[i].x,particles[i].y, 4, 0, Math.PI*2); 
-        c.fillStyle = "teal";
-        c.fill(); 
-        c.closePath();
+        if (tick)
+        {
+            c.fillStyle = "white";
+            c.fillRect(0,0,canvas.width,canvas.height);
+            c.fillStyle = "teal";
+            c.fill(); 
+            c.closePath();
+            c.drawImage( 
+                img,        // the image of the sprite sheet 
+                12*tick % (12*10),0,13,13, // source coordinates      (x,y,w,h) 
+                 50,50,13*5,13*5,  // destination coordinates (x,y,w,h) 
+            ); 
+        }
+        
+        // c.beginPath(); 
+        // c.arc(particles[i].x,particles[i].y, 4, 0, Math.PI*2); 
+        
         
     }
     // kill
