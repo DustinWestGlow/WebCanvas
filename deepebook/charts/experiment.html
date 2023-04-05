@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dustin's Website</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+
+<canvas width="200" height="200" id="canvas"></canvas> 
+<style type="text/css">
+    #canvas {
+        border: 1px solid black;
+    }
+</style>
+<script> 
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+var data = [ 16, 68, 20, 30, 54 ]; 
+ 
+var w = 200;
+var h = 200;
+
+// (0, 0) then (100, 100), .. (400, 400)
+var len = data.length;
+
+ctx.fillstyle = "red";
+ctx.strokeStyle = 'red';
+var barheight = (h / len);
+for (var i = 0; i < len; i++) {
+    
+    ctx.fillText(data[i] + " / 100",
+    0 + 4, barheight*(i+0.5) );
+    var y = barheight * (i);
+    // ctx.fillText("y: " + y, 50, y);
+    ctx.strokeRect(2, y, (data[i]/100) * w, barheight);
+}
+
+// ctx.strokeRect(2, 0, 68, 50);
+// ctx.strokeRect(2, 50, 68, 100);
+// ctx.strokeRect(2, 100, 68, 100);
+
+// ctx.fillstyle = "rgba(0,0,0,1.0)";
+// ctx.strokeStyle = 'red';
+// ctx.fillText("h: " + h + ", w: " + w,
+    // 10, 10 );
+// ctx.fillstyle = "rgba(0,0,0,1.0)";
+</script>
+    
+  </body>
+</html>
