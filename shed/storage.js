@@ -8,3 +8,7 @@ ctx.fillStyle = grad;
 ctx.beginPath();
 ctx.arc(100, 100, 50, 0, 2 * Math.PI);
 ctx.fill();
+
+function getRandomArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
+}

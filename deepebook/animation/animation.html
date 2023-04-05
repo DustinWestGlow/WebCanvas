@@ -1,0 +1,37 @@
+<html> 
+<body> 
+<canvas width="500" height="500" id="canvas"></canvas> 
+<script> 
+
+//get a reference to the canvas 
+var canvas = document.getElementById('canvas'); 
+//get a reference to the drawing context 
+var c = canvas.getContext('2d'); 
+
+// shim layer with setTimeout fallback 
+window.requestAnimFrame = (function(){ 
+  return  window.requestAnimationFrame       ||  
+          window.webkitRequestAnimationFrame ||  
+          window.mozRequestAnimationFrame    ||  
+          window.oRequestAnimationFrame      ||  
+          window.msRequestAnimationFrame     ||  
+          function( callback ){ 
+            window.setTimeout(callback, 1000 / 60); 
+          }; 
+})();
+
+var x = 0; 
+function drawIt() { 
+    window.requestAnimFrame(drawIt); 
+    var canvas = document.getElementById('canvas'); 
+    var c = canvas.getContext('2d');
+    c.clearRect(0,0,canvas.width,canvas.height);
+    c.fillStyle = "red"; 
+    c.fillRect(0,100,x,100); 
+    x = (x + 2) % 200;
+} 
+window.requestAnimFrame(drawIt); 
+
+</script> 
+</body> 
+</html> 

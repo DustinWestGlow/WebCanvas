@@ -1,0 +1,47 @@
+<html> 
+<body> 
+<canvas width="500" height="500" id="canvas"></canvas> 
+<script> 
+
+function getrand(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+//get a reference to the canvas 
+var canvas = document.getElementById('canvas'); 
+//get a reference to the drawing context 
+var c = canvas.getContext('2d'); 
+
+// shim layer with setTimeout fallback 
+window.requestAnimFrame = (function(){ 
+  return  window.requestAnimationFrame       ||  
+          window.webkitRequestAnimationFrame ||  
+          window.mozRequestAnimationFrame    ||  
+          window.oRequestAnimationFrame      ||  
+          window.msRequestAnimationFrame     ||  
+          function( callback ){ 
+            window.setTimeout(callback, 1000 / 60); 
+          }; 
+})();
+
+var x = 0; 
+var particles = []
+function create_particle() {
+    var x = getrand(10, 500 - 10);
+    var y = 
+}
+function drawIt() { 
+    window.requestAnimFrame(drawIt); 
+    var canvas = document.getElementById('canvas'); 
+    var c = canvas.getContext('2d');
+    var choice = getrand(0, 2);
+    if (choice % 3 == 0)
+    {
+        create_particle();
+    }
+} 
+window.requestAnimFrame(drawIt); 
+
+</script> 
+</body> 
+</html> 
