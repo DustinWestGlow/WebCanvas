@@ -1,0 +1,81 @@
+<html> 
+<body> 
+<canvas width="500" height="500" id="canvas"></canvas> 
+<script> 
+//initialize data set 
+var data = [ 100, 68, 50, 55, 100, 90, 120, 70, 50, 65, 110, 90 ]; 
+ 
+var canvas = document.getElementById('canvas'); 
+var c = canvas.getContext('2d'); 
+//draw background 
+c.fillStyle = "white"; 
+c.fillRect(0,0,500,500);
+
+//a list of colors 
+var colors = [].concat(...Array(4).fill(["red","black","yellow"]));
+ 
+//calculate total of all data 
+var total = 0; 
+for(var i=0; i<data.length; i++) { 
+    total += data[i]; 
+} 
+
+var zerozero = {x:30, y: 30};
+//draw axis lines 
+c.fillStyle = "black"; 
+c.lineWidth = 2.0; 
+c.beginPath(); 
+c.moveTo(500-zerozero.x, zerozero.y); 
+c.lineTo(zerozero.x, zerozero.y); 
+c.lineTo(zerozero.x, 500-zerozero.y); 
+c.stroke(); 
+
+var chart_width = 500 - zerozero.x;
+var chart_height = 500 - zerozero.y;
+
+// start data storage
+var xs = [];
+var ys = [];
+var widths = [];
+var onedataunit = 100;
+var oneradiusunit = 10;
+for (var i = 0; i < data.length; i++)
+{
+    xs[i] = zerozero.x + chart_width / data.length * i;
+    ys[i] = zerozero.y + chart_height * data[i] / onedataunit * 0.5;
+    widths[i] = Math.ceil((data[i] / onedataunit) * oneradiusunit)
+}
+// unpack data to graph
+for (var i = 0; i < data.length; i++)
+{
+    // draw circles
+    c.beginPath();
+    var x = xs[i];
+    var y = ys[i];
+    var w = widths[i];
+    c.moveTo(x, y);
+    c.arc(x, y, w, 0, Math.PI * 2, 0);
+    c.fillStyle = "rgba(220, 220, 20, 0.59)";
+    c.fill();
+    c.closePath();
+    // draw lines
+    c.strokeStyle = "green";
+    c.beginPath();
+    c.moveTo(x, y);
+    var j = Math.min(i+1, data.length);
+    c.lineTo(xs[j], ys[j]);
+    c.closePath();
+    c.stroke();
+}
+
+//draw centered text 
+c.fillStyle = "black"; 
+c.font = "24pt sans-serif"; 
+var text = "Sales Data from 2025"; 
+var metrics = c.measureText(text); 
+c.fillText(text, 250-metrics.width/2, 400); 
+c.fillText("(0, 0)", zerozero.x, zerozero.y); 
+ 
+</script> 
+</body> 
+</html> 

@@ -1,0 +1,57 @@
+<html> 
+<body> 
+<canvas width="500" height="500" id="canvas"></canvas> 
+<script> 
+//initialize data set 
+var data = [ 100, 68, 20, 30, 100 ]; 
+ 
+var canvas = document.getElementById('canvas'); 
+var c = canvas.getContext('2d'); 
+//draw background 
+c.fillStyle = "white"; 
+c.fillRect(0,0,500,500);
+
+//a list of colors 
+var colors = [ "orange", "green", "blue", "yellow", "teal"]; 
+ 
+//calculate total of all data 
+var total = 0; 
+for(var i=0; i<data.length; i++) { 
+    total += data[i]; 
+} 
+
+c.fillStyle = '#ccddff';
+c.beginPath();
+c.moveTo(50,20);
+c.lineTo(200,50);
+c.lineTo(93,82);
+c.closePath();
+c.fill();
+c.strokeStyle = 'rgb(0,128,0)';
+c.lineWidth = 2;
+c.stroke();
+var radius = 40;
+var center = {x: 250.0, y: 250.0};
+var angle = 0 * Math.PI;
+var x = center.x;
+var y = center.y + (500 / 2);
+for (var i = 0; i < data.length; i++) {
+    c.fillStyle = colors[i];
+    c.beginPath();
+    c.moveTo(center.x, center.y);
+    var percent = 100.0 * data[i] / total;
+    angle += (percent / 100.0) * 2.0 * Math.PI;
+    // c.lineTo(x, y);
+    x = center.x + Math.cos(angle) * radius;
+    y = center.y + Math.sin(angle) * radius;
+    c.lineTo(x, y);
+    c.lineTo(center.x, center.y);
+    c.closePath();
+    c.strokeStyle = colors[i];
+    c.lineWidth = 2;
+    c.stroke();
+}
+ 
+</script> 
+</body> 
+</html> 
