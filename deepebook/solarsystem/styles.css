@@ -1,0 +1,21 @@
+html {
+  font-family: sans-serif;
+  background-color: black;
+  color: white;
+}
+canvas {
+  border: 1px solid white;
+}
+table {
+  border-collapse: collapse;
+  border: 2px solid rgb(200,200,200);
+  letter-spacing: 1px;
+  font-size: 0.8rem;
+}
+td, th {
+  border: 1px solid rgb(190,190,190);
+  padding: 2px 2px;
+}
+td {
+  text-align: center;
+}
