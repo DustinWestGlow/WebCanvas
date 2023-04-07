@@ -1,19 +1,70 @@
-// shim layer with setTimeout fallback
-window.requestAnimFrame = (function(){
-  return  window.requestAnimationFrame       ||
-          window.webkitRequestAnimationFrame ||
-          window.mozRequestAnimationFrame    ||
-          window.oRequestAnimationFrame      ||
-          window.msRequestAnimationFrame     ||
-          function( callback ){
-            window.setTimeout(callback, 1000 / 60);
-          };
-})();
+/** Planet Radii
+ * and Orbit Radii (Circular)
+ * Used to calculate real math 2 pixels
+ **/
+var radii = [
+1.516 * Math.pow(10, 3),
+3.760 * Math.pow(10, 3),
+3.959 * Math.pow(10, 3),
+2.106 * Math.pow(10, 3),
+4.344 * Math.pow(10, 4),
+3.618 * Math.pow(10, 4),
+1.576 * Math.pow(10, 4),
+1.530 * Math.pow(10, 4)
+];
+var orbit_radii = [
+5.79 * Math.pow(10, 7),
+0.672 * Math.pow(10, 8),
+0.930 * Math.pow(10, 8),
+1.417 * Math.pow(10, 8),
+4.837 * Math.pow(10, 8),
+8.898 * Math.pow(10, 8),
+1.421 * Math.pow(10, 9),
+2.805 * Math.pow(10, 9)
+];
+// scale out to neptune
+outer = orbit_radii[orbit_radii.length - 1];
+// real miles 2 digital pixels
+// based on outer canvas limit a.k.a outermost planet
+// then draw outer as outer pix, middle as middle px, ...
+function real2d(miles) {
+  return miles / outer * canvas.width / 2;
+}
+class Planet {
+  constructor(nth, rad, real_rad, orb_rad, real_orb_rad, pimg) {
+    this.nth = nth;
+    this.radius = {r: real_rad, d: rad};
+    this.orbitRadius = {r: real_orb_rad, d: orb_rad};
+    this.x = {r: 0, d: 0};
+    this.y = {r: 0, d: 0};
+    this.img = pimg;
+    // start all planets in line at beginning of simulation
+    // distanced realistically
+    // will be wiped/updated by update loop
+  }
+}
+var pimgs = [
+"mercury.jpeg",
+"venus.jpeg",
+"earth.jpeg",
+"elonmusk.jpeg",
+"jupiter.jpeg",
+"saturn.jpeg",
+"uranus.jpeg",
+"neptune.jpeg",
+];
 
-function getrand(min, max) {
-  return Math.random() * (max - min) + min;
+planet_count = 8;
+var planets = [];
+for (var i = 0; i < planet_count; i++)
+{
+  var img = new Image();
+  img.src = "media/" + pimgs[i];
+  var np = new Planet(i, real2d(radii[i]), radii[i], real2d(orbit_radii[i]), orbit_radii[i], img);
+  planets.push(np);
 }
 
+/** BEGIN SUN */
 class Star {
   constructor(rad) {
     this.x = 0;
@@ -21,111 +72,49 @@ class Star {
     this.radius = rad;
   }
 }
-
-class Planet {
-  constructor(rad, orb_rad) {
-    this.radius = rad;
-    this.orbitRadius = orb_rad;
-    this.x = orb_rad;
-    this.y = 0;
-  }
-}
-
-//get a reference to the canvas
-var canvas = document.getElementById('canvas');
-//get a reference to the drawing context
-var c = canvas.getContext('2d');
-
-// https://stackoverflow.com/questions/5760897/html5-canvas-inverted-coordinate-system
-c.translate(0, 250);
-c.scale(1, -1);
-c.translate(250/2, 250/2);
-
-function clearScreen() {
-    c.fillStyle = "white";
-    c.fillRect(-canvas.width/2,-canvas.height/2,canvas.width,canvas.height);
-}
-
-var sun = new Star(25);
+var sun_radii = 4.325 * Math.pow(10, 5);
+var sun = new Star(sun_radii);
+var sun_img = new Image();
+// 'media' not '/media'
+sun_img.src = "media/sun.jpeg";
 function drawSun() {
+    // c.drawImage(sun_img, sun.x - 10, sun.y - 10, 20, 20);
     c.beginPath();
-    c.arc(sun.x, sun.y, sun.radius, 0, Math.PI * 2);
+    c.arc(sun.x, sun.y, real2d(sun.radius), 0, Math.PI * 2);
     c.fillStyle = "yellow";
     c.fill();
 }
-
-// solar system constants
-var earth_real = 9.3024 *Math.pow(10, 7);
-// largest real of planet orbits (earth or neptune/pluto)
-var lg_orbit = earth_real;
-var earth_mapped = (lg_orbit/earth_real)*canvas.width/2;
-
-var planets = [];
-var earth = new Planet(10, canvas.width / 2);
-planets.push(earth);
-function calc_orbit(orbit_real) {
-  orbit_ratio = orbit_real / earth_real;
-  ratio_mapped = earth_mapped * orbit_ratio;
-  return ratio_mapped;
-}
-function calc_radius(radius_real) {
-  // planets are really small in comparison to distance from sun
-  // so if planet radius too small, keep minmum size regardless
-  Math.max(, 7);
-}
-var mercury_distance = 2.9634 * Math.pow(10, 7);
-var mercury = new Planet(10, calc_orbit(mercury_distance));
-planets.push(mercury);
-
-
-//new code
-var imgs = [];
- 
-function loadResources() {
-  img = new Image();
-  img.src = "media/earth.jpeg";
-  imgs.push(img);
-}
-loadResources();
+/** END SUN */
 
 function drawPlanet(planet) {
     // draw and color planet
-    c.beginPath();
-    c.drawImage(imgs[0], planet.x - planet.radius, planet.y - planet.radius, 20, 20)
+    c.drawImage(planet.img, planet.x.d, planet.y.d, 20, 20);
     // c.arc(planet.x, planet.y, planet.radius, 0, Math.PI * 2);
-    c.fillStyle = "green";
-    c.fill();
     // draw and color orbit circle
     c.beginPath();
-    c.arc(sun.x, sun.y, planet.orbitRadius, 0, Math.PI*2);
+    // circle x,y at sun, then stretch out to planet
+    c.arc(sun.x, sun.y, planet.orbitRadius.d, 0, Math.PI*2);
     c.strokeStyle = "purple";
     c.stroke();
 }
-
-time = 0;
-// debug don't wipe screen
-// helped planet iteration and screen wipe problem
-keepclearing = true;
-function gameLoop() {
-  // only clear once per game loop
-  // DO NOT clear for every planet or only 1 planet will show
-  if (keepclearing)
-  {
-    // Clear Screen
-    clearScreen();
-  }
-  for (var i = 0; i < planets.length; i++) {
-    
-    // The Sun
-    drawSun();
-    // draw Earth
-    var planet = planets[i];
-    drawPlanet(planet);
-    // update Earth
-    time += 1;
-    planet.x = Math.cos(time * (2*Math.PI/360)) * planet.orbitRadius;
-    planet.y = Math.sin(time * (2*Math.PI/360)) * planet.orbitRadius;
-  }
-    window.requestAnimFrame(gameLoop);
+function updatePlanet(planet, time) {
+  angle = (time/360) * (2 * Math.PI);
+  planet.x.r = Math.cos(angle) * planet.orbitRadius.r;
+  planet.y.r = Math.sin(angle) * planet.orbitRadius.r;
+  planet.x.d = Math.cos(angle) * planet.orbitRadius.d;
+  planet.y.d = Math.sin(angle) * planet.orbitRadius.d;
 }
-window.requestAnimFrame(gameLoop);
+function pl_table_el(planet_nth, item_nth) {
+  var tr = document.querySelectorAll("#planets tr")[planet_nth];
+  var td = tr.querySelectorAll("td")[item_nth];
+  return td;
+}
+function observePlanet(planet) {
+}
+function general_info_planet(planet) {
+  pl_table_el(planet.nth, 0).textContent = planet.radius.d;
+  pl_table_el(planet.nth, 1).textContent = planet.radius.r;
+  pl_table_el(planet.nth, 2).textContent = planet.orbitRadius.d;
+  pl_table_el(planet.nth, 3).textContent = planet.orbitRadius.r;
+}
+// PHEW! Under 100 lines after refactor
