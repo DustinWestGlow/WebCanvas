@@ -2,24 +2,6 @@ function getrand(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-class Character {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.vx = 0;
-    }
-}
-
-class Pulsar {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
-var pulsars = [];
-
-var me = new Character(120, 230);
 document.onkeydown = function(e) {
 	if(e.keyCode == 37) {
 	    me.vx = -1;
@@ -37,33 +19,13 @@ document.onkeydown = function(e) {
     }
 };
 
-class Bullet {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
-var bullets = [];
-
-
 document.onkeyup = function(e) {
 	if(e.keyCode == 37 || e.keyCode == 39) {
 	    me.vx = 0;
 	}
 };
 
-class Enemy {
-  constructor() {
-    this.alive = true;
-    this.x = 0;
-  }
-}
-var enemies = [];
-for (var i = 0; i < 10; i++) {
-    var new_enemy = new Enemy();
-    enemies.push(new_enemy);
-}
+
 
 //get a reference to the canvas 
 var canvas = document.getElementById('canvas'); 
@@ -87,6 +49,7 @@ var tick = 0;
 var enxs = 0;
 var denxs = 1;
 var dead = false;
+
 function gameLoop() {
     if (dead == true) {
         var death_h1 = document.getElementById("dead")
@@ -94,19 +57,22 @@ function gameLoop() {
         canvas.style.display = "none";
         return;
     }
+    // Refresh Canvas
+    drawCanvas();
     window.requestAnimFrame(gameLoop);
     tick ++;
     if (tick > 10)
     {
         tick = 0;
     }
-    c.fillStyle = "black";
-    c.fillRect(0,0,canvas.width,canvas.height);
+    
     // c.drawImage( 
     //     img,        // the image of the sprite sheet 
     //     (12*tick) % (12*9) + 3,0+3,13-3*2,13-3*2, // source coordinates      (x,y,w,h) 
     //      50,50,13*5,13*5,  // destination coordinates (x,y,w,h) 
     // ); 
+    
+    // bounce x movement of enemies
     enxs += denxs;
     if (enxs > 40) {
         denxs = -1 * 0.2;
@@ -114,20 +80,9 @@ function gameLoop() {
     else if (enxs < 10) {
         denxs = 1 * 0.2;
     }
-    for (var i = 0; i < enemies.length; i++)
-    {
-        var x = enxs + (i * (200 / enemies.length));
-        var w = 140 / enemies.length;
-        // c.beginPath();
-        enemies[i].x = x;
-        if (enemies[i].alive == true) {
-            c.fillStyle = "green";
-        } else {
-            c.fillStyle = "black";
-        }
-        c.fillRect(x, 10, w, w);
-        // c.closePath();
-    }
+    // draw enemies
+    drawEnemies();
+    
     if (Math.ceil(getrand(1, 80)) == 14) {
         var bx = Math.ceil(getrand(30, 200));
         var by = 20;
