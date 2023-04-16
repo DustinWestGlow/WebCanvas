@@ -12,6 +12,9 @@ window.requestAnimFrame = (function(){
             window.setTimeout(callback, 1000 / 60); 
           }; 
 })();
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
 
 // image loading and storing
 var ship_image; 
@@ -72,18 +75,16 @@ class Bullet {
 }
 var bullets = [];
 
-function createBomb(enemy) { 
-    return { 
-        x:enemy.x, 
-        y:enemy.y+enemy.height, 
-        width:4, 
-        height:12, 
-        width:30, 
-        height:30, 
-        counter:0, 
+class Bomb { 
+    constructor(x, y) { 
+        this.x = x;
+        this.y = y; 
+        this.w = 30; 
+        this.h = 30; 
+        this.counter = 0;
     } 
 } 
- 
+var bombs = [];
 
 // enemy definition
 class Enemy {
@@ -143,7 +144,6 @@ function processInput() {
     }
 }
 
-// 
 function checkConditions() {
     
     // explained above
@@ -163,6 +163,8 @@ function checkConditions() {
     
 }
 
+// fire a bomb from an enemy frequently
+var random_counter = 0;
 function update() {
     
     // move enemies
@@ -185,14 +187,40 @@ function update() {
         bullets[i].y -= 4;
     }
     
+    // frequently fire a bomb
+    random_counter ++;
+    if (random_counter > 50) {
+        random_counter = 0;
+        // pick a random alive enemy
+        // by generating the list of alive enemies
+        var alive_enemies = [];
+        for (var i in enemies) {
+            if (enemies[i].alive == true) {
+                alive_enemies.push(enemies[i]);
+            }
+        }
+        // and picking a random one from the list
+        // console.log(alive_enemies);
+        var chosen = alive_enemies[
+            rand(0, alive_enemies.length)
+            ];
+        // then create and store a new bomb
+        bombs.push(
+            new Bomb(
+                chosen.x, chosen.y + chosen.h
+            )
+        );
+    }
+    
 }
 
 function drawPlayerBullets() {
     for(i in bullets) { 
         var bullet = bullets[i]; 
-        var count = Math.floor(bullet.counter/10); 
+        // slow down bullet animation slightly
+        var count = Math.floor(bullet.counter/2); 
         var yoff = (count%3)*12; 
-        //c.fillRect(bullet.x, bullet.y, bullet.width,bullet.height); 
+        // c.fillRect(bullet.x, bullet.y, bullet.width,bullet.height); 
         c.drawImage( 
             bullet_image, 
             0+146,yoff+2,8,8,//src 
@@ -201,16 +229,17 @@ function drawPlayerBullets() {
     } 
 }
 
-function drawBombs(c) { 
-    for(var i in enemyBullets) { 
-        var bullet = enemyBullets[i]; 
-        c.fillStyle = "yellow"; 
-        c.fillRect(bullet.x, bullet.y , bullet.width, bullet.height); 
-        var xoff = (bullet.counter%9)*12 + 1; 
-        var yoff = 1; 
+function drawBombs() { 
+    for(var i in bombs) { 
+        var bullet = bombs[i]; 
+        // c.fillStyle = "yellow"; 
+        // c.fillRect(bullet.x, bullet.y , bullet.w, bullet.h); 
+        var count = Math.floor(bullet.counter/4); 
+        var xoff = (count%3)*24; 
+        var yoff = 2; 
         c.drawImage(bomb_image, 
-            xoff,yoff,11,11,//src 
-            bullet.x,bullet.y,bullet.width,bullet.height//dest 
+            2+xoff,0+yoff,20,20,//src 
+            bullet.x,bullet.y,bullet.w,bullet.h//dest 
             ); 
     } 
 } 
