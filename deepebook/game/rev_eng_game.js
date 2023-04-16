@@ -13,6 +13,24 @@ window.requestAnimFrame = (function(){
           }; 
 })();
 
+// image loading and storing
+var ship_image; 
+var bomb_image; 
+var bullet_image; 
+loadResources(); 
+function loadResources() { 
+    
+    ship_image = new Image(); 
+    ship_image.src = "Hunter1.bmp"; 
+    
+    bomb_image = new Image(); 
+    bomb_image.src = "bomb1.bmp"; 
+     
+    bullet_image = new Image(); 
+    bullet_image.src = "Bullets.bmp"; 
+    
+} 
+
 var can_vars = {
     w: 600,
     h: 400
@@ -43,15 +61,29 @@ player.width = 46;
 player.height = 46;
 
 // player's weapon definition
-class Pulsar {
+class Bullet {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.w = 10;
-        this.h = 10;
+        this.w = 30;
+        this.h = 30;
+        this.counter = 0;
     }
 }
-var pulsars = [];
+var bullets = [];
+
+function createBomb(enemy) { 
+    return { 
+        x:enemy.x, 
+        y:enemy.y+enemy.height, 
+        width:4, 
+        height:12, 
+        width:30, 
+        height:30, 
+        counter:0, 
+    } 
+} 
+ 
 
 // enemy definition
 class Enemy {
@@ -84,10 +116,12 @@ var edriftx = 0;
 var emovex = 2;
 var edrifty = 0;
 
+
+
 // affect player coords by key input
 // only Left/Right by 3 pix per frame
-// pulsar once per key press trick
-var pulsar_pressed = false;
+// bullet once per key press trick
+var bullet_pressed = false;
 function processInput() {
     // left
     if (keys[37] == true) {
@@ -97,15 +131,15 @@ function processInput() {
     if (keys[39] == true) {
         player.x += 4;
     }
-    // space pulsars
+    // space bullets
     if (keys[32] == true) {
-        pulsar_pressed = true;
+        bullet_pressed = true;
     }
     if (keys[32] == false
-    && pulsar_pressed == true) {
-        pulsars.push(new Pulsar(
+    && bullet_pressed == true) {
+        bullets.push(new Bullet(
             player.x, player.y));
-        pulsar_pressed = false;
+        bullet_pressed = false;
     }
 }
 
@@ -137,12 +171,49 @@ function update() {
         enemies[i].y = 50 + edrifty;
     }
     
-    // keep shot path of pulsars
-    for (var i = 0; i < pulsars.length; i++) {
-        pulsars[i].y -= 8;
+    // keep shot path of bombs (enemy bullets)
+    // update their counters
+    for (var i = 0; i < bombs.length; i++) {
+        bombs[i].counter ++;
+        bombs[i].y += 1.5;
+    }
+    
+    // keep shot path of bullets
+    // update their counters
+    for (var i = 0; i < bullets.length; i++) {
+        bullets[i].counter ++;
+        bullets[i].y -= 4;
     }
     
 }
+
+function drawPlayerBullets() {
+    for(i in bullets) { 
+        var bullet = bullets[i]; 
+        var count = Math.floor(bullet.counter/10); 
+        var yoff = (count%3)*12; 
+        //c.fillRect(bullet.x, bullet.y, bullet.width,bullet.height); 
+        c.drawImage( 
+            bullet_image, 
+            0+146,yoff+2,8,8,//src 
+            bullet.x,bullet.y,bullet.w,bullet.h//dst 
+        ); 
+    } 
+}
+
+function drawBombs(c) { 
+    for(var i in enemyBullets) { 
+        var bullet = enemyBullets[i]; 
+        c.fillStyle = "yellow"; 
+        c.fillRect(bullet.x, bullet.y , bullet.width, bullet.height); 
+        var xoff = (bullet.counter%9)*12 + 1; 
+        var yoff = 1; 
+        c.drawImage(bomb_image, 
+            xoff,yoff,11,11,//src 
+            bullet.x,bullet.y,bullet.width,bullet.height//dest 
+            ); 
+    } 
+} 
 
 // draw screen
 function draw() {
@@ -153,9 +224,14 @@ function draw() {
     can_vars.w, can_vars.h);
     
     // player
-    c.fillStyle = "red";
-    c.fillRect(player.x, player.y,
-    player.w, player.h)
+    // c.fillStyle = "red";
+    // c.fillRect(player.x, player.y,
+    // player.w, player.h)
+     c.drawImage(ship_image,  
+	    26,2, 21,21, //src coords 
+	    player.x, player.y, player.w, player.h //dst coords 
+	    ); 
+ 
     
     // enemies
     c.fillStyle = "green";
@@ -165,13 +241,18 @@ function draw() {
         e.w, e.h);
     }
     
-    // pulsars
-    c.fillStyle = "blue";
-    for (var i = 0; i< pulsars.length; i++) {
-        var p = pulsars[i];
-        c.fillRect(p.x, p.y,
-        p.w, p.h);
-    }
+    // player bullets
+    drawPlayerBullets();
+    // // bullets
+    // c.fillStyle = "blue";
+    // for (var i = 0; i< bullets.length; i++) {
+    //     var p = bullets[i];
+    //     c.fillRect(p.x, p.y,
+    //     p.w, p.h);
+    // }
+    
+    // enemy bullets/bombs
+    drawBombs();
     
 }
 
